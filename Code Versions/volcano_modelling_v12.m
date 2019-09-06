@@ -2,8 +2,8 @@ clear all; close all; format long;
 
 %% User input
 
-region  = 'Africa-W';
-volcano = 'Cameroon';
+region  = 'Halmahera-Indonesia';
+volcano = 'Hiri';
 
 line_adj = 1.0;   % frac. change from Rbase for extending profile lines
 
@@ -120,11 +120,23 @@ end
 
 pXYZ = [px_arr(:, 2), py_arr(:, 2), pz_arr(:, 2)];
 
+[n1, n3, p] = bestfit_plane(pXYZ);
+[px, py]    = meshgrid(pXYZ(:,1), pXYZ(:,2));
+
+% Plane fit using n1 = V(:,1) normal vector
+
+zpln1 = (dot(n1, p) - n1(1)*px - n1(2)*py)/n1(3);
+zfit1 = (dot(n1, p) - n1(1)*pXYZ(:,1) - n1(2)*pXYZ(:,2))/n1(3);
+zadj1 = pXYZ(:,3) - zfit1;
+
 figure(2); hold on;
 set(gca, 'FontSize', 14)
-plot3(pXYZ(:,1)*(1e-3), pXYZ(:,2)*(1e-3), pXYZ(:,3)*(1e-3), 'ko', 'markerfacecolor', 'b');
+surf(px*(1e-3), py*(1e-3), zpln1*(1e-3), 'facecolor', 'y', 'facealpha', 0.8, 'edgecolor', 'none');
+surf(px*(1e-3), py*(1e-3), zeros(size(px)), 'facecolor', 'g', 'facealpha', 0.8, 'edgecolor', 'none');
+plot3(pXYZ(:,1)*(1e-3), pXYZ(:,2)*(1e-3), pXYZ(:,3)*(1e-3), 'ko', 'markerfacecolor', 'r');
+plot3(pXYZ(:,1)*(1e-3), pXYZ(:,2)*(1e-3), zadj1*(1e-3), 'ko', 'markerfacecolor', 'b');
 xlabel('X (km)');   ylabel('Y (km)');   zlabel('Elevation (km)');
-title('Azimuth Points')
+title('normal vector: n1')
 view(0, 45)
 grid on;
 
@@ -170,7 +182,7 @@ zadj3 = pXYZ(:,3) - zfit3;
 
 % Plotting
 
-figure(2); clf; hold on;
+figure(3); clf; hold on;
 set(gca, 'FontSize', 14)
 
 subplot(2,1,1); hold on;
